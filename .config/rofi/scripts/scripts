@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+choice=$(ls ~/scripts/rofi-scripts | rofi -dmenu -p Scripts)
+
+if [[ $choice == "Quit" ]] 
+then
+  exit 1
+elif [[ $choice ]] 
+then
+  ~/scripts/rofi-scripts/$choice
+fi

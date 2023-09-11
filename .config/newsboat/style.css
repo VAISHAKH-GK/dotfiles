@@ -1,0 +1,16 @@
+body {
+	max-width: 1100px;
+	margin: auto;
+	padding: 2%;
+	background-color: #171616;
+	color: #c5c4c4;
+}
+
+a {
+	color: #c5c4c4;
+}
+
+img {
+	max-width: 600px;
+	max-height: 100%; 
+}

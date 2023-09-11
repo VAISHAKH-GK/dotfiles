@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+swww init
+waybar &
+dunst &
+nm-applet --indicator &
+udiskie -A -t &
+blueman-applet &
+lxsession &
+swww img ~/.config/current-wallpaper.*
+foot --server &
+emacs --daemon
