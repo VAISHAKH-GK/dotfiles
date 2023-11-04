@@ -8,6 +8,7 @@
   - [[#setting-elpaca][Setting elpaca]]
 - [[#keybindings][Keybindings]]
   - [[#general-keybindings][General Keybindings]]
+  - [[#lsp-keybindings][Lsp keybindings]]
 - [[#packages--config][Packages & Config]]
   - [[#evil-mode][Evil Mode]]
   - [[#table-of-contetns][Table of contetns]]
@@ -110,9 +111,9 @@ use-package support for elpaca
   (load-file user-init-file))
 
 (defcustom buffer-skip-regexp
-  (rx bos (or (or "*Backtrace*" "*Compile-Log*" "*Completions*"
-                  "*Messages*" "*package*" "*Warnings*" "*vterm*"
-                  "*Async-native-compile-log*" "*rust-analyzer*" "*rust-analyzer::stderr*" "*Flymake log*" "*gopls*" "*gopls::stderr*" "*lsp-documentation*" "*html-ls*" "*html-ls::stderr*" "*css-ls*" "*css-ls::stderr*" "*godef*" "*Shell Command Output*" "*lua-language-server*" "*lua-language-server::stderr*")
+  (rx bos (or (or "*Backtrace*" "*Compile-Log*" "*Completions*" "*vterm*"
+                  "*Messages*" "*package*" "*Warnings*"
+                  "*Async-native-compile-log*" "*rust-analyzer*" "*rust-analyzer::stderr*" "*Flymake log*" "*gopls*" "*gopls::stderr*" "*lsp-documentation*" "*html-ls*" "*html-ls::stderr*" "*css-ls*" "*css-ls::stderr*" "*godef*" "*Shell Command Output*" "*lua-language-server*" "*lua-language-server::stderr*" "*compilation*" "*Flycheck error messages*" "*bash-ls*" "*bash-ls::stderr*" )
               (seq "magit-diff" (zero-or-more anything))
               (seq "magit-process" (zero-or-more anything))
               (seq "magit-revision" (zero-or-more anything))
@@ -286,6 +287,10 @@ use-package support for elpaca
 
   (vgk/leader-keys
     "p" '(projectile-command-map :wk "Projectile")))
+#+end_src
+** Lsp keybindings
+#+begin_src emacs-lisp
+
 #+end_src
 * Packages & Config
 ** Evil Mode
@@ -604,7 +609,7 @@ Org mode bullets instead of asterisks
   :config
   (setq neo-smart-open t
         neo-show-hidden-files t
-        neo-window-width 40
+        neo-window-width 30
         neo-window-fixed-size nil
         inhibit-compacting-font-caches t
         projectile-switch-project-action 'neotree-projectile-action) 
@@ -649,14 +654,10 @@ Org mode bullets instead of asterisks
 *** Language server
 **** Lsp
 #+begin_src emacs-lisp
-(defun efs/lsp-mode-setup ()
-  (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
-  (lsp-headerline-breadcrumb-mode))
-
 
 (use-package lsp-mode
   :commands (lsp lsp-deferred)
-  :hook (lsp-mode . efs/lsp-mode-setup)
+  :hook (prog-mode . lsp-mode)
   :init
   (setq lsp-keymap-prefix "C-l")  ;; or 'c-l', 's-l'
   :config
@@ -666,7 +667,8 @@ Org mode bullets instead of asterisks
 (setq lsp-headerline-breadcrumb-enable nil)
 (setq lsp-ui-sideline-enable nil)
 (setq lsp-completion-show-detail nil)
-(setq lsp-completion-show-kind nil)
+;; (setq lsp-completion-show-kind nil)
+(setq lsp-keep-workspace-alive nil)
 #+end_src
 **** Lsp-ui
 #+begin_src emacs-lisp
@@ -684,6 +686,13 @@ Org mode bullets instead of asterisks
 **** Rust
 #+begin_src emacs-lisp
 (use-package rust-mode)
+(use-package cargo)
+
+(add-hook 'rust-mode-hook #'aggressive-indent-mode)
+
+(setq lsp-rust-server 'rust-analyzer)
+
+(add-hook 'rust-mode-hook 'company-mode)
 #+end_src
 **** Go
 #+begin_src emacs-lisp
@@ -708,6 +717,25 @@ Org mode bullets instead of asterisks
 
 (use-package company-box
   :hook (company-mode . company-box-mode))
+#+end_src
+*** Flycheck
+#+begin_src emacs-lisp
+(use-package flycheck)
+#+end_src
+*** Markdown
+#+begin_src emacs-lisp
+(use-package markdown-mode
+  :ensure t
+  :mode ("README\\.md\\'" . gfm-mode)
+  :init (setq markdown-command "multimarkdown"))
+#+end_src
+*** Yaml
+#+begin_src emacs-lisp
+(use-package yaml-mode)
+#+end_src
+*** Impation Mode
+#+begin_src emacs-lisp
+(use-package impatient-mode)
 #+end_src
 ** Git Timemachine
 #+begin_src emacs-lisp
@@ -857,5 +885,4 @@ Org-tempo is not a separate package but a module within org that can be enabled.
 (setq pixel-scroll-mode 1)
 (setq pixel-scroll-precision-mode 1000000)
 #+end_src
-  
   
