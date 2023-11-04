@@ -139,7 +139,7 @@ button {
 }
 
 #battery {
-    color: @color11;
+    color: @color15;
 }
 
 #battery.charging, #battery.plugged {
