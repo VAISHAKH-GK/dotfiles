@@ -8,13 +8,12 @@
   - [[#setting-elpaca][Setting elpaca]]
 - [[#keybindings][Keybindings]]
   - [[#general-keybindings][General Keybindings]]
-  - [[#lsp-keybindings][Lsp keybindings]]
 - [[#packages--config][Packages & Config]]
   - [[#evil-mode][Evil Mode]]
   - [[#table-of-contetns][Table of contetns]]
   - [[#which-key][Which Key]]
   - [[#org-bullets][Org Bullets]]
-  - [[#sudo-edit][SUDO Edit]]
+  - [[#sudo-edit][Sudo Edit]]
   - [[#ivy--icons][Ivy & Icons]]
   - [[#window-move][Window Move]]
   - [[#shells-and-terminals][Shells and Terminals]]
@@ -109,7 +108,6 @@ use-package support for elpaca
   (interactive)
   (load-file user-init-file)
   (load-file user-init-file))
-
 (defcustom buffer-skip-regexp
   (rx bos (or (or "*Backtrace*" "*Compile-Log*" "*Completions*" "*vterm*"
                   "*Messages*" "*package*" "*Warnings*"
@@ -172,7 +170,8 @@ use-package support for elpaca
     "b R" '(rename-buffer :wk "Rename buffer")
     "b s" '(basic-save-buffer :wk "Save buffer")
     "b S" '(save-some-buffers :wk "Save multiple buffers")
-    "b w" '(bookmark-save :wk "Save current bookmarks to bookmark file"))
+    "b w" '(bookmark-save :wk "Save current bookmarks to bookmark file")
+    "b d" '(dashboard-open :wk "Open dashboard buffer"))
 
   (vgk/leader-keys
     "e" '(:ignore t :wk "Evaluate")    
@@ -286,11 +285,17 @@ use-package support for elpaca
     "m d t" '(org-time-stamp :wk "Org time stamp"))
 
   (vgk/leader-keys
-    "p" '(projectile-command-map :wk "Projectile")))
-#+end_src
-** Lsp keybindings
-#+begin_src emacs-lisp
+    "p" '(projectile-command-map :wk "Projectile"))
 
+  (vgk/leader-keys
+    "l" '(:ignore t :wk "Lsp keybindings")
+    "l d" '(lsp-ui-doc-glance :wk "Lsp Description")
+    "l g" '(lsp-find-definition :wk "Lsp go to Definition")
+    "l r" '(lsp-rename :wk "Lsp Rename")
+    "l f" '(:ignore :wk "Lsp Code formatting")
+    "l f r" '(lsp-format-region :wk "Lsp format region")
+    "l f b" '(lsp-format-buffer :wk "Lsp format buffer"))
+  )
 #+end_src
 * Packages & Config
 ** Evil Mode
@@ -368,7 +373,7 @@ Org mode bullets instead of asterisks
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 #+end_src
 
-** SUDO Edit
+** Sudo Edit
 #+begin_src emacs-lisp
 (use-package sudo-edit
   :config
@@ -657,7 +662,7 @@ Org mode bullets instead of asterisks
 
 (use-package lsp-mode
   :commands (lsp lsp-deferred)
-  :hook (prog-mode . lsp-mode)
+  :hook (prog-mode . lsp)
   :init
   (setq lsp-keymap-prefix "C-l")  ;; or 'c-l', 's-l'
   :config
@@ -732,10 +737,6 @@ Org mode bullets instead of asterisks
 *** Yaml
 #+begin_src emacs-lisp
 (use-package yaml-mode)
-#+end_src
-*** Impation Mode
-#+begin_src emacs-lisp
-(use-package impatient-mode)
 #+end_src
 ** Git Timemachine
 #+begin_src emacs-lisp
@@ -847,15 +848,15 @@ Org-tempo is not a separate package but a module within org that can be enabled.
 *** Font
 #+begin_src emacs-lisp
 (set-face-attribute 'default nil
-  :font "ComicMono Nerd Font"
+  :font "Comic Sans MS"
   :height 210
   :weight 'medium)
 (set-face-attribute 'variable-pitch nil
-  :font "ComicMono Nerd Font"
+  :font "Comic Sans MS"
   :height 210
   :weight 'medium)
 (set-face-attribute 'fixed-pitch nil
-  :font "ComicMono Nerd Font"
+  :font "Comic Sans MS"
   :height 210
   :weight 'medium)
 ;; Makes commented text and keywords italics.
@@ -869,7 +870,7 @@ Org-tempo is not a separate package but a module within org that can be enabled.
 ;; This sets the default font on all graphical frames created after restarting Emacs.
 ;; Does the same thing as 'set-face-attribute default' above, but emacsclient fonts
 ;; are not right unless I also add this method of setting the default font.
-(add-to-list 'default-frame-alist '(font . "ComicMono Nerd Font-17"))
+(add-to-list 'default-frame-alist '(font . "Comic Sans MS-19"))
 
 ;; Uncomment the following line if line spacing needs adjusting.
 (setq-default line-spacing 0.12)
@@ -877,7 +878,7 @@ Org-tempo is not a separate package but a module within org that can be enabled.
 
 *** Transparency
 #+begin_src emacs-lisp
-;; (add-to-list 'default-frame-alist '(alpha-background . 90)) ; For all new frames henceforth
+(add-to-list 'default-frame-alist '(alpha-background . 85)) ; For all new frames henceforth
 #+end_src
 *** Scroll
 #+begin_src emacs-lisp
