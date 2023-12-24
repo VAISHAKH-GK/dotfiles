@@ -18,6 +18,7 @@ if status is-interactive
   alias gf="git fetch"
   alias newsboat="newsboat -q"
   alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+  alias nsxiv="nsxiv -a"
 end
 
 function fish_user_key_bindings
