@@ -20,7 +20,6 @@
   - [[#rainbow-mode][Rainbow mode]]
   - [[#projectile][Projectile]]
   - [[#dashboard][Dashboard]]
-  - [[#doom-themes][Doom themes]]
   - [[#neotree][Neotree]]
   - [[#diminish][Diminish]]
   - [[#modeline][Modeline]]
@@ -29,6 +28,7 @@
   - [[#development][Development]]
   - [[#git-timemachine][Git Timemachine]]
   - [[#ripgrep][Ripgrep]]
+  - [[#doom-themes][Doom themes]]
 - [[#settings][Settings]]
   - [[#general-settings][General Settings]]
   - [[#ui][UI]]
@@ -36,7 +36,7 @@
 * Package manager
 ** Setting elpaca
 #+begin_src emacs-lisp 
-(defvar elpaca-installer-version 0.5)
+(defvar elpaca-installer-version 0.6)
   (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
   (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
   (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
@@ -108,25 +108,25 @@ use-package support for elpaca
   (interactive)
   (load-file user-init-file)
   (load-file user-init-file))
-(defcustom buffer-skip-regexp
-  (rx bos (or (or "*Backtrace*" "*Compile-Log*" "*Completions*" "*vterm*"
-                  "*Messages*" "*package*" "*Warnings*"
-                  "*Async-native-compile-log*" "*rust-analyzer*" "*rust-analyzer::stderr*" "*Flymake log*" "*gopls*" "*gopls::stderr*" "*lsp-documentation*" "*html-ls*" "*html-ls::stderr*" "*css-ls*" "*css-ls::stderr*" "*godef*" "*Shell Command Output*" "*lua-language-server*" "*lua-language-server::stderr*" "*compilation*" "*Flycheck error messages*" "*bash-ls*" "*bash-ls::stderr*" )
-              (seq "magit-diff" (zero-or-more anything))
-              (seq "magit-process" (zero-or-more anything))
-              (seq "magit-revision" (zero-or-more anything))
-              (seq "magit-stash" (zero-or-more anything)))
-      eos)
-  "Regular expression matching buffers ignored by `next-buffer' and
-`previous-buffer'."
-  :type 'regexp)
+
+(defvar buffer-skip-exceptions '("*dashboard*")
+  "List of buffers that should not be skipped.")
 
 (defun buffer-skip (window buffer bury-or-kill)
-  "Return t if BUFFER name matches `buffer-skip-regexp'."
-  (string-match-p buffer-skip-regexp (buffer-name buffer)))
+  "Return t if BUFFER name matches the pattern '*<anything>*' and is not in the exception list."
+  (and (string-match-p "^\\*.*\\*$" (buffer-name buffer))
+       (not (member (buffer-name buffer) buffer-skip-exceptions))))
 
 (setq switch-to-prev-buffer-skip 'buffer-skip)
 (setq switch-to-next-buffer-skip 'buffer-skip)
+
+(global-set-key [?\M-s] 'my-switch-to-buffer)
+
+(defun my-switch-to-buffer ()
+  (interactive)
+  (let ((completion-regexp-list '("\\`[^*]"
+                                  "\\`\\([^T]\\|T\\($\\|[^A]\\|A\\($\\|[^G]\\|G\\($\\|[^S]\\|S.\\)\\)\\)\\).*")))
+    (call-interactively 'switch-to-buffer)))
 
 (defun kill-this-buffer-and-close-window ()
   (interactive)
@@ -282,6 +282,7 @@ use-package support for elpaca
 
   (vgk/leader-keys
     "m d" '(:ignore t :wk "Date/deadline")
+    "m d s" '(org-schedule :wk "Org schedule agenda")
     "m d t" '(org-time-stamp :wk "Org time stamp"))
 
   (vgk/leader-keys
@@ -361,7 +362,7 @@ use-package support for elpaca
 	which-key-idle-delay 0.8
 	which-key-max-description-length 25
 	which-key-allow-imprecise-window-fit nil
-	which-key-separator " → " ))
+	which-key-separator " -> " ))
 #+end_src
 
 ** Org Bullets
@@ -588,26 +589,6 @@ Org mode bullets instead of asterisks
   :config
   (dashboard-setup-startup-hook))
 #+end_src
-** Doom themes
-#+begin_src emacs-lisp
-(use-package doom-themes
-  :ensure t
-  :config
-  ;; Global settings (defaults)
-  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-        doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'doom-challenger-deep t)
-
-  ;; ;; Enable flashing mode-line on errors
-  ;; (doom-themes-visual-bell-config)
-  ;; Enable custom neotree theme (all-the-icons must be installed!)
-  (doom-themes-neotree-config)
-  ;; or for treemacs users
-  (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
-  (doom-themes-treemacs-config)
-  ;; Corrects (and improves) org-mode's native fontification.
-  (doom-themes-org-config))
-#+end_src
 ** Neotree
 #+begin_src emacs-lisp
 (use-package neotree
@@ -646,9 +627,11 @@ Org mode bullets instead of asterisks
 #+end_src
 ** Magit
 #+begin_src emacs-lisp
+;; (use-package seq
+;; :after elpaca)
 (use-package magit
-  :custom
-  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+ :custom
+ (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 #+end_src
 ** Rainbow Delimiters
 #+begin_src emacs-lisp
@@ -684,7 +667,11 @@ Org mode bullets instead of asterisks
 #+end_src
 **** Lsp-treemacs
 #+begin_src emacs-lisp
+;; (use-package treemacs
+;;   :ensure t
+;; )
 (use-package lsp-treemacs
+  :after treemacs
   :after lsp)
 #+end_src
 *** Languages
@@ -706,6 +693,10 @@ Org mode bullets instead of asterisks
 **** Lua
 #+begin_src emacs-lisp
 (use-package lua-mode)
+#+end_src
+**** Web
+#+begin_src emacs-lisp
+(use-package web-mode )
 #+end_src
 *** Company Mode
 #+begin_src emacs-lisp
@@ -751,6 +742,26 @@ Org mode bullets instead of asterisks
 ** Ripgrep
 #+begin_src emacs-lisp
 (use-package rg)
+#+end_src
+** Doom themes
+#+begin_src emacs-lisp
+(use-package doom-themes
+  :ensure t
+  :config
+  ;; Global settings (defaults)
+  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+        doom-themes-enable-italic t) ; if nil, italics is universally disabled
+  (load-theme 'doom-badger t)
+
+  ;; ;; Enable flashing mode-line on errors
+  ;; (doom-themes-visual-bell-config)
+  ;; Enable custom neotree theme (all-the-icons must be installed!)
+  (doom-themes-neotree-config)
+  ;; or for treemacs users
+  (setq doom-themes-treemacs-theme "doom-tokyo-night") ; use "doom-colors" for less minimal icon theme
+  (doom-themes-treemacs-config)
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
 #+end_src
 * Settings
 ** General Settings
