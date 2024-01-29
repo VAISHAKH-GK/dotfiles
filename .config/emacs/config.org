@@ -36,6 +36,7 @@
 * Package manager
 ** Setting elpaca
 #+begin_src emacs-lisp 
+(use-package seq)
 (defvar elpaca-installer-version 0.6)
   (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
   (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
@@ -655,6 +656,7 @@ Org mode bullets instead of asterisks
 (setq lsp-headerline-breadcrumb-enable nil)
 (setq lsp-ui-sideline-enable nil)
 (setq lsp-completion-show-detail nil)
+(setq lsp-prefer-capf t) 
 ;; (setq lsp-completion-show-kind nil)
 (setq lsp-keep-workspace-alive nil)
 #+end_src
@@ -709,7 +711,7 @@ Org mode bullets instead of asterisks
 		("<tab>" . company-indent-or-complete-common))
   :custom
   (company-minimum-prefix-length 1)
-  (company-idle-delay 0.0))
+  (company-idle-delay 0.001))
 
 (use-package company-box
   :hook (company-mode . company-box-mode))
@@ -728,6 +730,14 @@ Org mode bullets instead of asterisks
 *** Yaml
 #+begin_src emacs-lisp
 (use-package yaml-mode)
+#+end_src
+*** Treesitter
+#+begin_src emacs-lisp
+(use-package tree-sitter)
+(use-package tree-sitter-langs)
+
+(add-hook 'prog-mode-hook #'tree-sitter-mode)
+(add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
 #+end_src
 ** Git Timemachine
 #+begin_src emacs-lisp
