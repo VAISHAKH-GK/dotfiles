@@ -29,6 +29,7 @@
   - [[#git-timemachine][Git Timemachine]]
   - [[#ripgrep][Ripgrep]]
   - [[#doom-themes][Doom themes]]
+  - [[#pdf][PDF]]
 - [[#settings][Settings]]
   - [[#general-settings][General Settings]]
   - [[#ui][UI]]
@@ -110,13 +111,13 @@ use-package support for elpaca
   (load-file user-init-file)
   (load-file user-init-file))
 
-(defvar buffer-skip-exceptions '("*dashboard*")
-  "List of buffers that should not be skipped.")
+;; (defvar buffer-skip-exceptions '("*dashboard*")
+;;   "List of buffers that should not be skipped.")
 
 (defun buffer-skip (window buffer bury-or-kill)
   "Return t if BUFFER name matches the pattern '*<anything>*' and is not in the exception list."
-  (and (string-match-p "^\\*.*\\*$" (buffer-name buffer))
-       (not (member (buffer-name buffer) buffer-skip-exceptions))))
+  (string-match-p "^\\*.*\\*$" (buffer-name buffer)))
+       ;; (not (member (buffer-name buffer) buffer-skip-exceptions))))
 
 (setq switch-to-prev-buffer-skip 'buffer-skip)
 (setq switch-to-next-buffer-skip 'buffer-skip)
@@ -698,7 +699,8 @@ Org mode bullets instead of asterisks
 #+end_src
 **** Web
 #+begin_src emacs-lisp
-(use-package web-mode )
+(use-package typescript-mode)
+(use-package js-mode)
 #+end_src
 *** Company Mode
 #+begin_src emacs-lisp
@@ -711,10 +713,47 @@ Org mode bullets instead of asterisks
 		("<tab>" . company-indent-or-complete-common))
   :custom
   (company-minimum-prefix-length 1)
-  (company-idle-delay 0.001))
+  (company-idle-delay 0.000))
 
 (use-package company-box
   :hook (company-mode . company-box-mode))
+#+end_src
+*** Corfu
+#+begin_src emacs-lisp
+;; (use-package corfu
+;;   ;; Optional customizations
+;;   :custom
+;;   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+;;   (corfu-auto t)                 ;; Enable auto completion
+;;   (corfu-separator ?\s)          ;; Orderless field separator
+;;   ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+;;   ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+;;   (corfu-preview-current nil)    ;; Disable current candidate preview
+;;   (corfu-preselect 'prompt)      ;; Preselect the prompt
+;;   (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+;;   (corfu-scroll-margin 5)        ;; Use scroll margin
+
+;;   ;; Enable Corfu only for certain modes.
+;;   :hook ((prog-mode . corfu-mode))
+;;   ;;        (shell-mode . corfu-mode)
+;;   ;;        (eshell-mode . corfu-mode))
+
+;;   ;; Recommended: Enable Corfu globally.  This is recommended since Dabbrev can
+;;   ;; be used globally (M-/).  See also the customization variable
+;;   ;; `global-corfu-modes' to exclude certain modes.
+;;   :init
+;;   (global-corfu-mode))
+
+;; ;; A few more useful configurations...
+;; (setq tab-always-indent 'complete)
+;; (setq completion-cycle-threshold 3)
+;; ;; Enable auto completion and configure quitting
+;; ;; (setq corfu-auto t
+;; ;;       corfu-quit-no-match 'separator) ;; or t
+;; (setq-local corfu-auto        t
+;;             corfu-auto-delay  0 ;; TOO SMALL - NOT RECOMMENDED
+;;             corfu-auto-prefix 1 ;; TOO SMALL - NOT RECOMMENDED
+;;             completion-styles '(basic))
 #+end_src
 *** Flycheck
 #+begin_src emacs-lisp
@@ -761,7 +800,7 @@ Org mode bullets instead of asterisks
   ;; Global settings (defaults)
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
         doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'doom-badger t)
+  (load-theme 'catppuccin t)
 
   ;; ;; Enable flashing mode-line on errors
   ;; (doom-themes-visual-bell-config)
@@ -772,6 +811,23 @@ Org mode bullets instead of asterisks
   (doom-themes-treemacs-config)
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
+#+end_src
+#+end_src
+** PDF
+#+begin_src emacs-lisp
+(use-package pdf-tools
+  :defer t
+  :commands (pdf-loader-install)
+  :mode "\\.pdf\\'"
+  :bind (:map pdf-view-mode-map
+              ("j" . pdf-view-next-line-or-next-page)
+              ("k" . pdf-view-previous-line-or-previous-page)
+              ("j" . pdf-view-enlarge)
+              ("j" . pdf-view-shrink))
+  :init (pdf-loader-install)
+  :config (add-to-list 'revert-without-query ".pdf"))
+
+(add-hook 'pdf-view-mode-hook (lambda () (display-line-numbers-mode -1)))
 #+end_src
 * Settings
 ** General Settings
