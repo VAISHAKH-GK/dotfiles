@@ -10,3 +10,4 @@ lxsession &
 swww img ~/.config/current-wallpaper.*
 foot --server &
 emacs --daemon
+# ibus-daemon -rxRd
