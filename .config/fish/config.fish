@@ -45,3 +45,4 @@ set MOZ_ENABLE_WAYLAND 1
 set -x LD_LIBRARY_PATH /usr/local/lib
 
 set -x XDG_CONFIG_HOME $HOME/.config
+eval (ssh-agent -c) > /dev/null
