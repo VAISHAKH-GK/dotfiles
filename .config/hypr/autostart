@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+emacs --daemon &
 swww init
 waybar &
 dunst &
@@ -9,5 +10,6 @@ blueman-applet &
 lxsession &
 swww img ~/.config/current-wallpaper.*
 foot --server &
-emacs --daemon
+ags run &
+
 # ibus-daemon -rxRd
