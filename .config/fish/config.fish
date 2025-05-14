@@ -25,6 +25,13 @@ function fish_user_key_bindings
   fish_vi_key_bindings
 end
 
+set ANDROID_SDK_ROOT /opt/android-sdk
+set -x ANDROID_HOME $HOME/Android/Sdk
+set -x CAPACITOR_ANDROID_STUDIO_PATH /usr/bin/android-studio
+set -x PATH $PATH $ANDROID_SDK_ROOT/cmdline-tools/latest/bin
+set -x JAVA_HOME /usr/lib/jvm/java-21-openjdk
+set -x GRADLE_LOCAL_JAVA_HOME /usr/lib/jvm/java-21-openjdk
+
 set PATH $PATH /home/vaishakh/.local/bin
 set -x PATH $PATH ~/.cargo/bin/
 set -x PATH $PATH ~/programming/go/bin/
@@ -39,10 +46,12 @@ set -x GOSUMDB off
 set -x GOTELEMETRY off
 
 set -x EDITOR emacsclient
-set -x BROWSER qutebrowser
+set -x BROWSER zen-browser
 
 set MOZ_ENABLE_WAYLAND 1
 set -x LD_LIBRARY_PATH /usr/local/lib
 
 set -x XDG_CONFIG_HOME $HOME/.config
 eval (ssh-agent -c) > /dev/null
+
+set -gx NVM_DIR $HOME/.nvm
