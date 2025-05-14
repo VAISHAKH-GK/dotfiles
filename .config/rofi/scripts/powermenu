@@ -98,7 +98,9 @@ case ${chosen} in
 		run_cmd --reboot
         ;;
     $lock)
-		if [[ -x '/usr/bin/swaylock' ]]; then
+		if [[ -x '/usr/bin/hyprlock' ]]; then
+			hyprlock
+		elif [[ -x '/usr/bin/swaylock' ]]; then
 			swaylock
 		elif [[ -x '/usr/bin/i3lock' ]]; then
 			i3lock
