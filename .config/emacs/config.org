@@ -9,6 +9,7 @@
 - [[#keybindings][Keybindings]]
   - [[#general-keybindings][General Keybindings]]
 - [[#packages--config][Packages & Config]]
+  - [[#exec-path][Exec Path]]
   - [[#evil-mode][Evil Mode]]
   - [[#table-of-contetns][Table of contetns]]
   - [[#which-key][Which Key]]
@@ -162,7 +163,7 @@ use-package support for elpaca
     "b C" '(clone-indirect-buffer-other-window :wk "Clone indirect buffer in new window")
     "b d" '(bookmark-delete :wk "Delete bookmark")
     "b i" '(ibuffer :wk "Ibuffer")
-    "b k" '(kill-this-buffer :wk "Kill this buffer")
+    "b k" '(kill-current-buffer :wk "Kill this buffer")
     "b K" '(kill-some-buffers :wk "Kill multiple buffers")
     "b l" '(list-bookmarks :wk "List bookmarks")
     "b m" '(bookmark-set :wk "Set bookmark")
@@ -301,6 +302,16 @@ use-package support for elpaca
   )
 #+end_src
 * Packages & Config
+** Exec Path
+#+begin_src emacs-lisp
+(use-package exec-path-from-shell
+  :ensure t
+  :config
+  (exec-path-from-shell-initialize))
+
+(when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize))
+#+end_src
 ** Evil Mode
 #+begin_src emacs-lisp
 (use-package evil
@@ -700,7 +711,38 @@ Org mode bullets instead of asterisks
 **** Web
 #+begin_src emacs-lisp
 (use-package typescript-mode)
-(use-package js-mode)
+#+end_src
+**** Node
+#+begin_src emacs-lisp
+(use-package js2-mode)
+
+(use-package dap-mode 
+  :ensure t 
+  :after lsp-mode) 
+ 
+(use-package nodejs-repl 
+  :ensure t) 
+
+(use-package lsp-javascript-typescript 
+    :ensure t 
+    :after lsp-mode 
+    :config 
+    (setq lsp-javascript-format-enable t) 
+    (setq lsp-typescript-format-enable t)) 
+#+end_src
+**** Prettier
+#+begin_src emacs-lisp
+(use-package prettier-js)
+
+(add-hook 'js-mode-hook 'prettier-js-mode)
+(add-hook 'web-mode-hook 'prettier-js-mode)
+(add-hook 'typescript-mode-hook 'prettier-js-mode)
+
+(setq prettier-js-use-modules-bin nil)
+#+end_src
+**** Arduino
+#+begin_src emacs-lisp
+
 #+end_src
 *** Company Mode
 #+begin_src emacs-lisp
@@ -800,14 +842,14 @@ Org mode bullets instead of asterisks
   ;; Global settings (defaults)
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
         doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'catppuccin t)
+  (load-theme 'doom-solarized-dark t)
 
   ;; ;; Enable flashing mode-line on errors
   ;; (doom-themes-visual-bell-config)
   ;; Enable custom neotree theme (all-the-icons must be installed!)
   (doom-themes-neotree-config)
   ;; or for treemacs users
-  (setq doom-themes-treemacs-theme "doom-tokyo-night") ; use "doom-colors" for less minimal icon theme
+  (setq doom-themes-treemacs-theme "doom-colors") ; use "doom-colors" for less minimal icon theme
   (doom-themes-treemacs-config)
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
@@ -862,7 +904,18 @@ Org mode bullets instead of asterisks
 
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 2)
+(setq-default standard-indent 2)
 (setq indent-line-function 'insert-tab)
+
+(setq c-basic-offset 2)
+(setq python-indent-offset 2)
+(setq js-indent-level 2)
+(setq css-indent-offset 2)
+(setq typescript-indent-level 2)
+(setq web-mode-code-indent-offset 2)
+(setq web-mode-markup-indent-offset 2)
+(setq web-mode-css-indent-offset 2)
+
 ;; No more typing the whole yes or no. Just y or n will do.
 (fset 'yes-or-no-p 'y-or-n-p)
 #+end_src
