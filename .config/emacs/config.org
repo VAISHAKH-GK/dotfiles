@@ -593,8 +593,8 @@ Org mode bullets instead of asterisks
   (setq dashboard-startup-banner "~/.config/emacs/images/emacs-dash.png")  ;; use custom image as banner
   (setq dashboard-center-content nil) ;; set to 't' for centered content
   (setq dashboard-items '((recents . 5)
-                          (agenda . 5 )
-                          (bookmarks . 3)
+                          ;; (agenda . 5 )
+                          ;; (bookmarks . 3)
                           (projects . 3)))
   :custom
   (dashboard-modify-heading-icons '((recents . "file-text")
@@ -655,12 +655,10 @@ Org mode bullets instead of asterisks
 *** Language server
 **** Lsp
 #+begin_src emacs-lisp
-
+(setq gc-cons-threshold 100000000)
 (use-package lsp-mode
   :commands (lsp lsp-deferred)
   :hook (prog-mode . lsp)
-  :init
-  (setq lsp-keymap-prefix "C-l")  ;; or 'c-l', 's-l'
   :config
   (define-key lsp-mode-map (kbd "C-l") lsp-command-map)
   (lsp-enable-which-key-integration t))
@@ -671,13 +669,68 @@ Org mode bullets instead of asterisks
 (setq lsp-prefer-capf t) 
 ;; (setq lsp-completion-show-kind nil)
 (setq lsp-keep-workspace-alive nil)
+
+(setq lsp-keymap-prefix "C-c l")           ; Prefix for LSP actions
+;; (setq lsp-completion-provider :none)       ; Using Corfu as the provider
+(setq lsp-diagnostics-provider :flycheck)
+(setq lsp-session-file (locate-user-emacs-file ".lsp-session"))
+(setq lsp-log-io nil)                      ; IMPORTANT! Use only for debugging! Drastically affects performance
+(setq lsp-keep-workspace-alive nil)        ; Close LSP server if all project buffers are closed
+(setq lsp-idle-delay 0.5)                  ; Debounce timer for `after-change-function'
+;; core
+(setq lsp-enable-xref t)                   ; Use xref to find references
+(setq lsp-auto-configure t)                ; Used to decide between current active servers
+(setq lsp-eldoc-enable-hover t)            ; Display signature information in the echo area
+(setq lsp-enable-dap-auto-configure t)     ; Debug support
+(setq lsp-enable-file-watchers nil)
+(setq lsp-enable-folding nil)              ; I disable folding since I use origami
+(setq lsp-enable-imenu t)
+(setq lsp-enable-indentation nil)          ; I use prettier
+(setq lsp-enable-links nil)                ; No need since we have `browse-url'
+(setq lsp-enable-on-type-formatting nil)   ; Prettier handles this
+(setq lsp-enable-suggest-server-download t) ; Useful prompt to download LSP providers
+(setq lsp-enable-symbol-highlighting t)     ; Shows usages of symbol at point in the current buffer
+(setq lsp-enable-text-document-color nil)   ; This is Treesitter's job
+
+(setq lsp-ui-sideline-show-hover nil)      ; Sideline used only for diagnostics
+(setq lsp-ui-sideline-diagnostic-max-lines 20) ; 20 lines since typescript errors can be quite big
+;; completion
+(setq lsp-completion-enable t)
+(setq lsp-completion-enable-additional-text-edit t) ; Ex: auto-insert an import for a completion candidate
+(setq lsp-enable-snippet t)                         ; Important to provide full JSX completion
+(setq lsp-completion-show-kind t)                   ; Optional
+;; headerline
+(setq lsp-headerline-breadcrumb-enable t)  ; Optional, I like the breadcrumbs
+(setq lsp-headerline-breadcrumb-enable-diagnostics nil) ; Don't make them red, too noisy
+(setq lsp-headerline-breadcrumb-enable-symbol-numbers nil)
+(setq lsp-headerline-breadcrumb-icons-enable nil)
+;; modeline
+(setq lsp-modeline-code-actions-enable nil) ; Modeline should be relatively clean
+(setq lsp-modeline-diagnostics-enable nil)  ; Already supported through `flycheck'
+(setq lsp-modeline-workspace-status-enable nil) ; Modeline displays "LSP" when lsp-mode is enabled
+(setq lsp-signature-doc-lines 1)                ; Don't raise the echo area. It's distracting
+(setq lsp-ui-doc-use-childframe t)              ; Show docs for symbol at point
+(setq lsp-eldoc-render-all nil)            ; This would be very useful if it would respect `lsp-signature-doc-lines', currently it's distracting
+;; lens
+(setq lsp-lens-enable nil)                 ; Optional, I don't need it
+;; semantic
+(setq lsp-semantic-tokens-enable nil)      ; Related to highlighting, and we defer to treesitter
 #+end_src
 **** Lsp-ui
 #+begin_src emacs-lisp
-(use-package lsp-ui
-  :hook (lsp-mode . lsp-ui-mode)
-  :custom
-  (lsp-ui-doc-position 'bottom))
+    (use-package lsp-ui
+      :ensure t
+      :commands
+      (lsp-ui-doc-show
+       lsp-ui-doc-glance)
+      :bind (:map lsp-mode-map
+                  ("C-c C-d" . 'lsp-ui-doc-glance))
+      :after (lsp-mode evil)
+      :config (setq lsp-ui-doc-enable t
+                    evil-lookup-func #'lsp-ui-doc-glance ; Makes K in evil-mode toggle the doc for symbol at point
+                    lsp-ui-doc-show-with-cursor nil      ; Don't show doc when cursor is over symbol - too distracting
+                    lsp-ui-doc-include-signature t       ; Show signature
+                    lsp-ui-doc-position 'at-point))
 #+end_src
 **** Lsp-treemacs
 #+begin_src emacs-lisp
@@ -711,6 +764,21 @@ Org mode bullets instead of asterisks
 **** Web
 #+begin_src emacs-lisp
 (use-package typescript-mode)
+
+(use-package lsp-tailwindcss
+    ;; :straight '(lsp-tailwindcss :type git :host github :repo "merrickluo/lsp-tailwindcss")
+    :init (setq lsp-tailwindcss-add-on-mode t)
+    :config
+    (dolist (tw-major-mode
+            '(css-mode
+                css-ts-mode
+                typescript-mode
+                typescript-ts-mode
+                tsx-ts-mode
+                js2-mode
+                js-ts-mode
+                clojure-mode))
+    (add-to-list 'lsp-tailwindcss-major-modes tw-major-mode)))
 #+end_src
 **** Node
 #+begin_src emacs-lisp
@@ -723,22 +791,36 @@ Org mode bullets instead of asterisks
 (use-package nodejs-repl 
   :ensure t) 
 
-(use-package lsp-javascript-typescript 
-    :ensure t 
-    :after lsp-mode 
-    :config 
-    (setq lsp-javascript-format-enable t) 
-    (setq lsp-typescript-format-enable t)) 
+;; (use-package lsp-typescript 
+;;     :ensure t 
+;;     :after lsp-mode 
+;;     :config 
+;;     (setq lsp-typescript-format-enable t)) 
 #+end_src
 **** Prettier
 #+begin_src emacs-lisp
-(use-package prettier-js)
+;; (use-package prettier-js)
 
-(add-hook 'js-mode-hook 'prettier-js-mode)
-(add-hook 'web-mode-hook 'prettier-js-mode)
-(add-hook 'typescript-mode-hook 'prettier-js-mode)
+;; (add-hook 'js-mode-hook 'prettier-js-mode)
+;; (add-hook 'web-mode-hook 'prettier-js-mode)
+;; (add-hook 'typescript-mode-hook 'prettier-js-mode)
 
-(setq prettier-js-use-modules-bin nil)
+;; (setq prettier-js-use-modules-bin nil)
+#+end_src
+**** Apheleia
+#+begin_src emacs-lisp
+(use-package apheleia
+  :ensure apheleia
+  :diminish ""
+  :defines
+  apheleia-formatters
+  apheleia-mode-alist
+  :functions
+  apheleia-global-mode
+  :config
+  (setf (alist-get 'prettier-json apheleia-formatters)
+        '("prettier" "--stdin-filepath" filepath))
+  (apheleia-global-mode +1))
 #+end_src
 **** Arduino
 #+begin_src emacs-lisp
@@ -796,6 +878,40 @@ Org mode bullets instead of asterisks
 ;;             corfu-auto-delay  0 ;; TOO SMALL - NOT RECOMMENDED
 ;;             corfu-auto-prefix 1 ;; TOO SMALL - NOT RECOMMENDED
 ;;             completion-styles '(basic))
+;; (use-package corfu
+;;     :ensure t
+;;     ;; Optional customizations
+;;     :custom
+;;     (corfu-cycle t)                 ; Allows cycling through candidates
+;;     (corfu-auto t)                  ; Enable auto completion
+;;     (corfu-auto-prefix 2)           ; Minimum length of prefix for completion
+;;     (corfu-auto-delay 0)            ; No delay for completion
+;;     (corfu-popupinfo-delay '(0.5 . 0.2))  ; Automatically update info popup after that numver of seconds
+;;     (corfu-preview-current 'insert) ; insert previewed candidate
+;;     (corfu-preselect 'prompt)
+;;     (corfu-on-exact-match nil)      ; Don't auto expand tempel snippets
+;;     ;; Optionally use TAB for cycling, default is `corfu-complete'.
+;;     :bind (:map corfu-map
+;;                 ("M-SPC"      . corfu-insert-separator)
+;;                 ("TAB"        . corfu-next)
+;;                 ([tab]        . corfu-next)
+;;                 ("S-TAB"      . corfu-previous)
+;;                 ([backtab]    . corfu-previous)
+;;                 ("S-<return>" . corfu-insert)
+;;                 ("RET"        . corfu-insert))
+
+;;     :init
+;;     (global-corfu-mode)
+;;     (corfu-history-mode)
+;;     (corfu-popupinfo-mode) ; Popup completion info
+;;     :config
+;;     (add-hook 'eshell-mode-hook
+;;             (lambda () (setq-local corfu-quit-at-boundary t
+;;                                     corfu-quit-no-match t
+;;                                     corfu-auto nil)
+;;                 (corfu-mode))
+;;             nil
+;;             t))
 #+end_src
 *** Flycheck
 #+begin_src emacs-lisp
@@ -842,7 +958,7 @@ Org mode bullets instead of asterisks
   ;; Global settings (defaults)
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
         doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'doom-solarized-dark t)
+  (load-theme 'doom-moonlight t)
 
   ;; ;; Enable flashing mode-line on errors
   ;; (doom-themes-visual-bell-config)
@@ -1000,7 +1116,7 @@ Org-tempo is not a separate package but a module within org that can be enabled.
 ;; This sets the default font on all graphical frames created after restarting Emacs.
 ;; Does the same thing as 'set-face-attribute default' above, but emacsclient fonts
 ;; are not right unless I also add this method of setting the default font.
-(add-to-list 'default-frame-alist '(font . "ComicMono Nerd Font-19"))
+(add-to-list 'default-frame-alist '(font . "ComicMono Nerd Font-21"))
 
 ;; Uncomment the following line if line spacing needs adjusting.
 (setq-default line-spacing 0.12)
