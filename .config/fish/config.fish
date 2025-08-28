@@ -25,14 +25,14 @@ function fish_user_key_bindings
   fish_vi_key_bindings
 end
 
-set ANDROID_SDK_ROOT /opt/android-sdk
-set -x ANDROID_HOME $HOME/Android/Sdk
-set -x CAPACITOR_ANDROID_STUDIO_PATH /usr/bin/android-studio
-set -x PATH $PATH $ANDROID_SDK_ROOT/cmdline-tools/latest/bin
+set -x ANDROID_SDK_ROOT /opt/android-sdk
+set -x ANDROID_HOME $ANDROID_SDK_ROOT
+set -x ANDROID_AVD_HOME $HOME/.android/avd
+set -x PATH $PATH $ANDROID_SDK_ROOT/cmdline-tools/latest/bin $ANDROID_SDK_ROOT/emulator $ANDROID_SDK_ROOT/platform-tools
 set -x JAVA_HOME /usr/lib/jvm/java-21-openjdk
 set -x GRADLE_LOCAL_JAVA_HOME /usr/lib/jvm/java-21-openjdk
 
-set PATH $PATH /home/vaishakh/.local/bin
+set -x PATH $PATH /home/vaishakh/.local/bin
 set -x PATH $PATH ~/.cargo/bin/
 set -x PATH $PATH ~/programming/go/bin/
 set -x PATH $PATH ~/.config/emacs/bin/
