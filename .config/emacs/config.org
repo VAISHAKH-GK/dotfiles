@@ -756,6 +756,7 @@ Org mode bullets instead of asterisks
 **** Go
 #+begin_src emacs-lisp
 (use-package go-mode)
+(use-package go-template-mode)
 #+end_src
 **** Lua
 #+begin_src emacs-lisp
@@ -1076,6 +1077,13 @@ Org-tempo is not a separate package but a module within org that can be enabled.
   ;; set flag to allow exit without query on any
   ;;active flymake processes
   (set-process-query-on-exit-flag ad-return-value nil))
+#+end_src
+*** Clipboard
+#+begin_src emacs-lisp
+(setq select-enable-primary t)
+(setq select-enable-clipboard t)
+(setq x-select-enable-primary t)
+(setq x-select-enable-clipboard t)
 #+end_src
 ** UI
 *** Theme & Layout

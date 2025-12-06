@@ -2,6 +2,8 @@
  (expand-file-name
   "config.org"
   user-emacs-directory))
+(setq read-process-output-max (* 10 1024 1024)) ;; 10mb
+(setq gc-cons-threshold 200000000)
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -27,7 +29,8 @@
  '(helm-minibuffer-history-key "M-p")
  '(org-agenda-files
    '("~/Documents/org/todo.org" "/home/vaishakh/Documents/org/agenda.org"))
- '(package-selected-packages '(eglot evil exec-path-from-shell helm rainbow-mode)))
+ '(package-selected-packages '(eglot evil exec-path-from-shell helm rainbow-mode))
+ '(warning-suppress-types '((elpaca core \30.1) (lsp-mode) (use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
