@@ -10,5 +10,6 @@ blueman-applet &
 lxsession &
 foot --server &
 ags run &
+wl-clip-persist -c both
 
 # ibus-daemon -rxRd
