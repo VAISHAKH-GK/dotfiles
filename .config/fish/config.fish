@@ -34,12 +34,12 @@ set -x GRADLE_LOCAL_JAVA_HOME /usr/lib/jvm/java-21-openjdk
 
 set -x PATH $PATH /home/vaishakh/.local/bin
 set -x PATH $PATH ~/.cargo/bin/
-set -x PATH $PATH ~/programming/go/bin/
+set -x PATH $PATH ~/go/bin/
 set -x PATH $PATH ~/.config/emacs/bin/
 set -x PATH $PATH ~/scripts/
 
-set -x GOPATH ~/programming/go
-set -x GOBIN ~/programming/go/bin
+set -x GOPATH ~/go
+set -x GOBIN ~/go/bin
 
 set -x GOPROXY direct
 set -x GOSUMDB off
