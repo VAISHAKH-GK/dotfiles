@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 emacs --daemon &
-swww-daemon &
+awww-daemon &
 waybar &
 dunst &
 nm-applet --indicator &
@@ -10,6 +10,7 @@ blueman-applet &
 lxsession &
 foot --server &
 ags run &
+swayosd-server &
 wl-clip-persist -c both
 
 # ibus-daemon -rxRd
