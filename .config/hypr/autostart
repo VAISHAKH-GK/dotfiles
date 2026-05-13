@@ -11,6 +11,6 @@ lxsession &
 foot --server &
 ags run &
 swayosd-server &
-wl-clip-persist -c both
-
+wl-paste --type text --watch cliphist store
+wl-paste --type image --watch cliphist stor
 # ibus-daemon -rxRd
