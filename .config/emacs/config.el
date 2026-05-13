@@ -3,6 +3,7 @@
   :init
   (setq evil-want-integration t)
   :config
+	(setq evil-undo-system 'undo-redo)
   (evil-mode 1))
 
 ;; Which Key
