@@ -1,0 +1,139 @@
+#+TITLE: Emacs Configuration
+#+AUTHOR: Vaishakh GK
+#+DESCRIPTION: Personal Emacs Configuration
+#+STARTUP: overview
+
+* Package Management
+
+#+begin_src emacs-lisp
+(require 'package)
+
+(setq package-archives
+      '(("melpa" . "https://melpa.org/packages/")
+        ("gnu" . "https://elpa.gnu.org/packages/")))
+
+(package-initialize)
+
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+(require 'use-package)
+
+(setq use-package-always-ensure t)
+#+end_src
+
+* General Editor Behavior
+
+#+begin_src emacs-lisp
+;; Apply .editorconfig configurations
+(editorconfig-mode 1)
+
+;; Global indentation defaults
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
+(setq-default standard-indent 4)
+
+;; Language indentation
+(setq-default c-basic-offset 4)
+
+(setq python-indent-offset 4)
+
+(setq js-indent-level 4)
+
+(setq lua-indent-level 4)
+
+;; Lisp indentation
+(setq lisp-body-indent 2)
+
+;; Better scrolling
+(setq scroll-conservatively 101)
+
+;; Short prompts
+(fset 'yes-or-no-p 'y-or-n-p)
+
+;; Automatically reload changed files
+(global-auto-revert-mode 1)
+
+;; Save minibuffer history
+(savehist-mode 1)
+
+;; Remember cursor positions
+(save-place-mode 1)
+
+;; Disable backup/autosave files
+(setq make-backup-files nil)
+(setq auto-save-default nil)
+(setq create-lockfiles nil)
+#+end_src
+
+
+#+begin_src emacs-lisp
+;; Disable startup screen
+(setq inhibit-startup-message t)
+
+;; Column number
+(column-number-mode 1)
+
+;; Line numbers
+(setq display-line-numbers-type t)
+(global-display-line-numbers-mode 1)
+
+;; Electric features
+(electric-indent-mode 1)
+(electric-pair-mode 1)
+
+;; Escape quits prompts
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+#+end_src
+
+* UI Configuration
+** Fonts
+
+#+begin_src emacs-lisp
+(add-to-list 'default-frame-alist
+             (cons 'font
+                   (if (eq system-type 'windows-nt)
+                       "CaskaydiaCove NF Regular-18"
+                     "CaskaydiaCove Nerd Font-21")))
+#+end_src
+
+** Theme
+
+#+begin_src emacs-lisp
+(use-package gruber-darker-theme
+  :config
+  (load-theme 'gruber-darker t))
+#+end_src
+
+* Evil Mode
+
+#+begin_src emacs-lisp
+(use-package evil
+  :init
+  (setq evil-want-integration t)
+  (setq evil-undo-system 'undo-redo)
+
+  :config
+  (evil-mode 1))
+#+End_src
+
+* Which Key
+
+#+begin_src emacs-lisp
+(use-package which-key
+  :config
+  (which-key-mode 1))
+#+end_src
+
+* Programming Languages
+
+** Go
+
+#+begin_src emacs-lisp
+(use-package go-mode
+  :hook
+  (go-mode . (lambda ()
+               (setq-local tab-width 4)
+               (setq-local indent-tabs-mode t))))
+#+end_src
