@@ -15,4 +15,7 @@
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
 
 ;; Setting font
-(add-to-list 'default-frame-alist '(font . "CaskaydiaCove Nerd Font-21"))
+(add-to-list 'default-frame-alist
+             (cons 'font (if (eq system-type 'windows-nt)
+                             "CaskaydiaCove NF Regular-18"      ;; Windows string
+                           "CaskaydiaCove Nerd Font-21")))      ;; Linux string
