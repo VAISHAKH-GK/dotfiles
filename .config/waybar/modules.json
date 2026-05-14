@@ -48,8 +48,8 @@
     },
     // Keyboard State
     "keyboard-state": {
-        "numlock": true,
-        "capslock": true,
+        "numlock": false,
+        "capslock": false,
         "format": "{name} {icon}",
         "format-icons": {
             "locked": "",
