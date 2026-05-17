@@ -26,65 +26,62 @@
 * General Editor Behavior
 
 #+begin_src emacs-lisp
-;; Apply .editorconfig configurations
-(editorconfig-mode 1)
+  ;; Apply .editorconfig configurations
+  (editorconfig-mode 1)
 
-;; Global indentation defaults
-(setq-default indent-tabs-mode nil)
-(setq-default tab-width 4)
-(setq-default standard-indent 4)
+  ;; Global indentation defaults
+  (setq-default indent-tabs-mode nil)
+  (setq-default tab-width 4)
+  (setq-default standard-indent 4)
 
-;; Language indentation
-(setq-default c-basic-offset 4)
+  ;; Better scrolling
+  (setq scroll-conservatively 101)
 
-(setq python-indent-offset 4)
+  ;; Short prompts
+  (fset 'yes-or-no-p 'y-or-n-p)
 
-(setq js-indent-level 4)
+  ;; Automatically reload changed files
+  (global-auto-revert-mode 1)
 
-(setq lua-indent-level 4)
+  ;; Save minibuffer history
+  (savehist-mode 1)
 
-;; Lisp indentation
-(setq lisp-body-indent 2)
+  ;; Remember cursor positions
+  (save-place-mode 1)
 
-;; Better scrolling
-(setq scroll-conservatively 101)
+  ;; Disable backup/autosave files
+  (setq make-backup-files nil)
+  (setq auto-save-default nil)
+  (setq create-lockfiles nil)
 
-;; Short prompts
-(fset 'yes-or-no-p 'y-or-n-p)
+  ;; Electric features
+  (electric-indent-mode 1)
+  (electric-pair-mode 1)
 
-;; Automatically reload changed files
-(global-auto-revert-mode 1)
+  ;; Disable startup screen
+  (setq inhibit-startup-message t)
 
-;; Save minibuffer history
-(savehist-mode 1)
+  ;; Enable word wrap
+  (global-visual-line-mode 1)
 
-;; Remember cursor positions
-(save-place-mode 1)
-
-;; Disable backup/autosave files
-(setq make-backup-files nil)
-(setq auto-save-default nil)
-(setq create-lockfiles nil)
+  ;; Escape quits prompts
+  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 #+end_src
 
+** Org Tempo
+Org-tempo is not a separate package but a module within org that can be enabled.  Org-tempo allows for ‘<s’ followed by TAB to expand to a begin_src tag.  Other expansions available include:
 
 #+begin_src emacs-lisp
-;; Disable startup screen
-(setq inhibit-startup-message t)
+  (require 'org-tempo)
+#+End_src
 
-;; Column number
-(column-number-mode 1)
+Disabling auto pair for < in org mode to make it work better with org tempo.
 
-;; Line numbers
-(setq display-line-numbers-type t)
-(global-display-line-numbers-mode 1)
-
-;; Electric features
-(electric-indent-mode 1)
-(electric-pair-mode 1)
-
-;; Escape quits prompts
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+#+begin_src emacs-lisp
+  (add-hook 'org-mode-hook (lambda ()
+    (setq-local electric-pair-inhibit-predicate
+    `(lambda (c)
+        (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))))
 #+end_src
 
 * UI Configuration
@@ -106,6 +103,15 @@
   (load-theme 'gruber-darker t))
 #+end_src
 
+** General
+#+begin_src emacs-lisp
+;; Column number
+(column-number-mode 1)
+
+;; Line numbers
+(setq display-line-numbers-type 'relative)
+(global-display-line-numbers-mode 1)
+#+end_src
 * Evil Mode
 
 #+begin_src emacs-lisp
@@ -136,4 +142,143 @@
   (go-mode . (lambda ()
                (setq-local tab-width 4)
                (setq-local indent-tabs-mode t))))
+#+end_src
+
+** C / C++
+
+#+begin_src emacs-lisp
+(setq-default c-basic-offset 4)
+
+(add-hook 'c-mode-hook
+          (lambda ()
+            (setq-local indent-tabs-mode nil)
+            (setq-local tab-width 4)))
+
+(add-hook 'c++-mode-hook
+          (lambda ()
+            (setq-local indent-tabs-mode nil)
+            (setq-local tab-width 4)))
+#+end_src
+
+** Python
+
+#+begin_src emacs-lisp
+(setq python-indent-offset 4)
+
+(add-hook 'python-mode-hook
+          (lambda ()
+            (setq-local indent-tabs-mode nil)
+            (setq-local tab-width 4)))
+#+end_src
+
+** JavaScript
+
+#+begin_src emacs-lisp
+(setq js-indent-level 2)
+
+(add-hook 'js-mode-hook
+          (lambda ()
+            (setq-local indent-tabs-mode nil)
+            (setq-local tab-width 2)))
+#+end_src
+
+** TypeScript
+
+#+begin_src emacs-lisp
+(use-package typescript-mode
+  :mode "\\.ts\\'"
+
+  :hook
+  (typescript-mode . (lambda ()
+                       (setq-local typescript-indent-level 2)
+                       (setq-local indent-tabs-mode nil)
+                       (setq-local tab-width 2))))
+#+end_src
+
+** Web Mode (HTML / CSS / JSX / TSX)
+
+#+begin_src emacs-lisp
+(use-package web-mode
+  :mode ("\\.html?\\'"
+         "\\.tsx\\'"
+         "\\.jsx\\'")
+
+  :hook
+  (web-mode . (lambda ()
+                (setq-local web-mode-code-indent-offset 2)
+                (setq-local web-mode-markup-indent-offset 2)
+                (setq-local web-mode-css-indent-offset 2)
+                (setq-local indent-tabs-mode nil)
+                (setq-local tab-width 2))))
+#+end_src
+
+** CSS
+
+#+begin_src emacs-lisp
+(setq css-indent-offset 2)
+
+(add-hook 'css-mode-hook
+          (lambda ()
+            (setq-local indent-tabs-mode nil)
+            (setq-local tab-width 2)))
+#+end_src
+
+** Lua
+
+#+begin_src emacs-lisp
+(setq lua-indent-level 4)
+
+(use-package lua-mode
+  :mode "\\.lua\\'"
+
+  :hook
+  (lua-mode . (lambda ()
+                (setq-local indent-tabs-mode nil)
+                (setq-local tab-width 4))))
+#+end_src
+
+** Shell Scripts
+
+#+begin_src emacs-lisp
+(add-hook 'sh-mode-hook
+          (lambda ()
+            (setq-local sh-basic-offset 4)
+            (setq-local sh-indentation 4)
+            (setq-local indent-tabs-mode nil)
+            (setq-local tab-width 4)))
+#+end_src
+
+** Rust
+
+#+begin_src emacs-lisp
+(use-package rust-mode
+  :mode "\\.rs\\'"
+
+  :hook
+  (rust-mode . (lambda ()
+                 (setq-local rust-format-on-save t)
+                 (setq-local indent-tabs-mode nil)
+                 (setq-local tab-width 4))))
+#+end_src
+
+** Lisp Family
+
+#+begin_src emacs-lisp
+(setq lisp-body-indent 2)
+
+(add-hook 'emacs-lisp-mode-hook
+          (lambda ()
+            (setq-local indent-tabs-mode nil)))
+
+(add-hook 'lisp-mode-hook
+          (lambda ()
+            (setq-local indent-tabs-mode nil)))
+
+(add-hook 'scheme-mode-hook
+          (lambda ()
+            (setq-local indent-tabs-mode nil)))
+
+(add-hook 'clojure-mode-hook
+          (lambda ()
+            (setq-local indent-tabs-mode nil)))
 #+end_src
