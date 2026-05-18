@@ -46,9 +46,6 @@
   ;; Save minibuffer history
   (savehist-mode 1)
 
-  ;; Remember cursor positions
-  (save-place-mode 1)
-
   ;; Disable backup/autosave files
   (setq make-backup-files nil)
   (setq auto-save-default nil)
@@ -73,7 +70,7 @@ Org-tempo is not a separate package but a module within org that can be enabled.
 
 #+begin_src emacs-lisp
   (require 'org-tempo)
-#+End_src
+#+end_src
 
 Disabling auto pair for < in org mode to make it work better with org tempo.
 
@@ -81,7 +78,7 @@ Disabling auto pair for < in org mode to make it work better with org tempo.
   (add-hook 'org-mode-hook (lambda ()
     (setq-local electric-pair-inhibit-predicate
     `(lambda (c)
-        (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))))
+        (if (char-equal c ?< ) t (,electric-pair-inhibit-predicate c))))))
 #+end_src
 
 * UI Configuration
@@ -98,9 +95,11 @@ Disabling auto pair for < in org mode to make it work better with org tempo.
 ** Theme
 
 #+begin_src emacs-lisp
-(use-package gruber-darker-theme
-  :config
-  (load-theme 'gruber-darker t))
+  (use-package gruber-darker-theme)
+
+  (use-package catppuccin-theme
+    :config
+    (load-theme 'catppuccin t))
 #+end_src
 
 ** General
@@ -115,14 +114,20 @@ Disabling auto pair for < in org mode to make it work better with org tempo.
 * Evil Mode
 
 #+begin_src emacs-lisp
-(use-package evil
-  :init
-  (setq evil-want-integration t)
-  (setq evil-undo-system 'undo-redo)
+  (use-package evil
+    :init
+      (setq evil-want-keybinding nil)
+      (setq evil-want-integration t)
+      (setq evil-undo-system 'undo-redo)
 
-  :config
-  (evil-mode 1))
-#+End_src
+      :config
+      (evil-mode 1))
+
+  (use-package evil-collection
+    :after evil
+    :config
+    (evil-collection-init))
+#+end_src
 
 * Which Key
 
@@ -264,21 +269,219 @@ Disabling auto pair for < in org mode to make it work better with org tempo.
 ** Lisp Family
 
 #+begin_src emacs-lisp
-(setq lisp-body-indent 2)
+  (setq lisp-body-indent 2)
 
-(add-hook 'emacs-lisp-mode-hook
-          (lambda ()
-            (setq-local indent-tabs-mode nil)))
+  (add-hook 'emacs-lisp-mode-hook
+            (lambda ()
+              (setq-local indent-tabs-mode nil)))
 
-(add-hook 'lisp-mode-hook
-          (lambda ()
-            (setq-local indent-tabs-mode nil)))
+  (add-hook 'lisp-mode-hook
+            (lambda ()
+              (setq-local indent-tabs-mode nil)))
 
-(add-hook 'scheme-mode-hook
-          (lambda ()
-            (setq-local indent-tabs-mode nil)))
+  (add-hook 'scheme-mode-hook
+            (lambda ()
+              (setq-local indent-tabs-mode nil)))
 
-(add-hook 'clojure-mode-hook
-          (lambda ()
-            (setq-local indent-tabs-mode nil)))
+  (add-hook 'clojure-mode-hook
+            (lambda ()
+              (setq-local indent-tabs-mode nil)))
+#+end_src
+
+* General keybinding
+#+begin_src emacs-lisp
+  (defvar buffer-skip-exceptions '("*dashboard*" "*magit*")
+    "List of buffers that should not be skipped.")
+
+    (defun buffer-skip (window buffer bury-or-kill)
+      "Return t if BUFFER name matches the pattern '*<anything>*' and is not in the exception list."
+      (string-match-p "^\\*.*\\*$" (buffer-name buffer)))
+           ;; (not (member (buffer-name buffer) buffer-skip-exceptions))))
+
+    (setq switch-to-prev-buffer-skip 'buffer-skip)
+    (setq switch-to-next-buffer-skip 'buffer-skip)
+
+    (global-set-key (kbd "M-s") #'my-switch-to-buffer)
+
+    (defun my-switch-to-buffer ()
+      (interactive)
+      (let ((completion-regexp-list '("\\`[^*]"
+                                      "\\`\\([^T]\\|T\\($\\|[^A]\\|A\\($\\|[^G]\\|G\\($\\|[^S]\\|S.\\)\\)\\)\\).*")))
+        (call-interactively 'switch-to-buffer)))
+
+    (defun kill-this-buffer-and-close-window ()
+      (interactive)
+      (kill-this-buffer)
+      (evil-window-delete))
+
+      (use-package general
+        :config
+        (general-evil-setup)
+        
+        ;; space as leader key
+        (general-create-definer vgk/leader-keys
+          :states '(normal insert visual emacs motion)
+          :keymaps 'override
+          :prefix "SPC" ;; setting leader key 
+          :global-prefix "M-SPC") ;; for insert mode
+
+        (vgk/leader-keys 
+          "SPC" '(counsel-M-x :wk "Counsel M-x")
+          "." '(find-file :wk "Find file")
+          "f" '(:ignore t :wk "Find")
+          "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
+          "f r" '(counsel-recentf :wk "Find recent files")
+          "c" '(:ignore t :wk "Comment / Colors")
+          "c t" '(load-theme :wk "Load theme")
+          "c c" '(comment-dwim :wk "Comment lines"))
+
+        (vgk/leader-keys
+          "b" '(:ignore t :wk "Bookmarks/Buffers")
+          "b c" '(clone-indirect-buffer :wk "Create indirect buffer copy in a split")
+          "b C" '(clone-indirect-buffer-other-window :wk "Clone indirect buffer in new window")
+          "b d" '(bookmark-delete :wk "Delete bookmark")
+          "b i" '(ibuffer :wk "Ibuffer")
+          "b k" '(kill-current-buffer :wk "Kill this buffer")
+          "b K" '(kill-some-buffers :wk "Kill multiple buffers")
+          "b l" '(list-bookmarks :wk "List bookmarks")
+          "b m" '(bookmark-set :wk "Set bookmark")
+          "b n" '(next-buffer :wk "Next buffer")
+          "b p" '(previous-buffer :wk "Previous buffer")
+          "b r" '(revert-buffer :wk "Reload buffer")
+          "b R" '(rename-buffer :wk "Rename buffer")
+          "b s" '(basic-save-buffer :wk "Save buffer")
+          "b S" '(save-some-buffers :wk "Save multiple buffers")
+          "b w" '(bookmark-save :wk "Save current bookmarks to bookmark file"))
+          ;; "b d" '(dashboard-open :wk "Open dashboard buffer")) b d is already used for buffer delete
+
+        (vgk/leader-keys
+          "e" '(:ignore t :wk "Evaluate")    
+          "e b" '(eval-buffer :wk "Evaluate elisp in buffer")
+          "e d" '(eval-defun :wk "Evaluate defun containing or after point")
+          "e e" '(eval-expression :wk "Evaluate and elisp expression")
+          "e l" '(eval-last-sexp :wk "Evaluate elisp expression before point")
+          "e r" '(eval-region :wk "Evaluate elisp in region")) 
+
+        (vgk/leader-keys
+          "h" '(:ignore t :wk "Help")
+          "h a" '(counsel-apropos :wk "Apropos")
+          "h b" '(describe-bindings :wk "Describe bindings")
+          "h c" '(describe-char :wk "Describe character under cursor")
+          "h d" '(:ignore t :wk "Emacs documentation")
+          "h d a" '(about-emacs :wk "About Emacs")
+          "h d d" '(view-emacs-debugging :wk "View Emacs debugging")
+          "h d f" '(view-emacs-FAQ :wk "View Emacs FAQ")
+          "h d m" '(info-emacs-manual :wk "The Emacs manual")
+          "h d n" '(view-emacs-news :wk "View Emacs news")
+          "h d o" '(describe-distribution :wk "How to obtain Emacs")
+          "h d p" '(view-emacs-problems :wk "View Emacs problems")
+          "h d t" '(view-emacs-todo :wk "View Emacs todo")
+          "h d w" '(describe-no-warranty :wk "Describe no warranty")
+          "h e" '(view-echo-area-messages :wk "View echo area messages")
+          "h f" '(describe-function :wk "Describe function")
+          "h F" '(describe-face :wk "Describe face")
+          "h g" '(describe-gnu-project :wk "Describe GNU Project")
+          "h i" '(info :wk "Info")
+          "h I" '(describe-input-method :wk "Describe input method")
+          "h k" '(describe-key :wk "Describe key")
+          "h l" '(view-lossage :wk "Display recent keystrokes and the commands run")
+          "h L" '(describe-language-environment :wk "Describe language environment")
+          "h m" '(describe-mode :wk "Describe mode")
+          "h r" '(:ignore t :wk "Reload")
+          "h r r" '((lambda () (interactive)
+                      (load-file "~/.config/emacs/init.el"))
+                    :wk "Reload emacs config")
+          "h v" '(describe-variable :wk "Describe variable")
+          "h w" '(where-is :wk "Prints keybinding for command if set")
+          "h x" '(describe-command :wk "Display full documentation for command"))
+
+        (vgk/leader-keys
+          "t" '(:ignore t :wk "Toggle")
+          "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
+          "t t" '(visual-line-mode :wk "Toggle truncated lines") 
+          "t n" '(neotree-toggle :wk "Toggle neotree file viewer"))
+
+        (vgk/leader-keys
+          "w" '(:ignore t :wk "Windows")
+          ;; Window splits
+          "w c" '(evil-window-delete :wk "Close window")
+          "w x" '(kill-this-buffer-and-close-window :wk "Kill this buffer and Close window")
+          "w n" '(evil-window-new :wk "New window")
+          "w s" '(evil-window-split :wk "Horizontal split window")
+          "w v" '(evil-window-vsplit :wk "Vertical split window")
+          ;; Window motions
+          "w h" '(evil-window-left :wk "Window left")
+          "w j" '(evil-window-down :wk "Window down")
+          "w k" '(evil-window-up :wk "Window up")
+          "w l" '(evil-window-right :wk "Window right")
+          "w w" '(evil-window-next :wk "Goto next window")
+          ;; Move Windows
+          "w H" '(buf-move-left :wk "Buffer move left")
+          "w J" '(buf-move-down :wk "Buffer move down")
+          "w K" '(buf-move-up :wk "Buffer move up")
+          "w L" '(buf-move-right :wk "Buffer move right"))
+        
+        (vgk/leader-keys
+          "g" '(:ignore t :wk "Git")    
+          "g /" '(magit-dispatch :wk "Magit dispatch")
+          "g ." '(magit-file-dispatch :wk "Magit file dispatch")
+          "g b" '(magit-branch-checkout :wk "Switch branch")
+          "g c" '(:ignore t :wk "Create") 
+          "g c b" '(magit-branch-and-checkout :wk "Create branch and checkout")
+          "g c c" '(magit-commit-create :wk "Create commit")
+          "g c f" '(magit-commit-fixup :wk "Create fixup commit")
+          "g C" '(magit-clone :wk "Clone repo")
+          "g f" '(:ignore t :wk "Find") 
+          "g f c" '(magit-show-commit :wk "Show commit")
+          "g f f" '(magit-find-file :wk "Magit find file")
+          "g f g" '(magit-find-git-config-file :wk "Find gitconfig file")
+          "g F" '(magit-fetch :wk "Git fetch")
+          "g g" '(magit-status :wk "Magit status")
+          "g i" '(magit-init :wk "Initialize git repo")
+          "g l" '(magit-log-buffer-file :wk "Magit buffer log")
+          "g r" '(vc-revert :wk "Git revert file")
+          "g s" '(magit-stage-file :wk "Git stage file")
+          "g t" '(git-timemachine :wk "Git time machine")
+          "g u" '(magit-stage-file :wk "Git unstage file"))
+
+        (vgk/leader-keys 
+          "\\" '(vterm-toggle :wk "Vterm Terminal"))
+
+        (vgk/leader-keys
+          "m" '(:ignore t :wk "Org")
+          "m a" '(org-agenda :wk "Org agenda")
+          "m e" '(org-export-dispatch :wk "Org export dispatch")
+          "m i" '(org-toggle-item :wk "Org toggle item")
+          "m t" '(org-todo :wk "Org todo")
+          "m B" '(org-babel-tangle :wk "Org babel tangle")
+          "m T" '(org-todo-list :wk "Org todo list"))
+
+        (vgk/leader-keys
+          "m b" '(:ignore t :wk "Tables")
+          "m b -" '(org-table-insert-hline :wk "Insert hline in table"))
+
+        (vgk/leader-keys
+          "m d" '(:ignore t :wk "Date/deadline")
+          "m d s" '(org-schedule :wk "Org schedule agenda")
+          "m d t" '(org-time-stamp :wk "Org time stamp"))
+
+        (vgk/leader-keys
+          "p" '(projectile-command-map :wk "Projectile"))
+
+        (vgk/leader-keys
+          "l" '(:ignore t :wk "Lsp keybindings")
+          "l d" '(lsp-ui-doc-glance :wk "Lsp Description")
+          "l g" '(lsp-find-definition :wk "Lsp go to Definition")
+          "l r" '(lsp-rename :wk "Lsp Rename")
+          "l f" '(:ignore :wk "Lsp Code formatting")
+          "l f r" '(lsp-format-region :wk "Lsp format region")
+          "l f b" '(lsp-format-buffer :wk "Lsp format buffer"))
+
+        (vgk/leader-keys
+          "n" '(:ignore t :wk "Notes")
+          "n j" '(org-journal-new-entry :wk "New journal")
+          "n t" '(org-todo-list :wk "Todo list")
+          "n a" '(org-agenda :wk "Agenda")
+          "n c" '(org-capture :wk "Capture"))
+        )
 #+end_src
