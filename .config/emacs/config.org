@@ -69,6 +69,8 @@
 
   ;; Enable recentf-mode for consult-recent-files
   (recentf-mode 1)
+  ;; Disable pop up UI dialogs
+  (setq use-dialog-box nil)
 #+end_src
 
 * Org
