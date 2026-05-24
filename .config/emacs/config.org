@@ -117,13 +117,18 @@ Setting font for windows and other operating system
 
 Install themes and set default theme
 
-
 #+begin_src emacs-lisp
   (use-package gruber-darker-theme)
 
   (use-package catppuccin-theme
     :config
     (load-theme 'catppuccin t))
+#+end_src
+
++ Transperancy
+
+#+begin_src emacs-lisp
+(add-to-list 'default-frame-alist '(alpha-background . 80))
 #+end_src
 
 ** General
@@ -330,6 +335,7 @@ Line numbering and relative line numbers
 #+end_src
 
 * Dashboard
+
 #+begin_src emacs-lisp
   (use-package dashboard
     :ensure t
@@ -340,6 +346,10 @@ Line numbering and relative line numbers
   (setq initial-buffer-choice 'dashboard-open)
 #+end_src
 
+* Magit
+#+begin_src emacs-lisp
+(use-package magit)
+#+end_src
 * General keybinding
 
 #+begin_src emacs-lisp
