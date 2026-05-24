@@ -65,7 +65,9 @@
   (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 #+end_src
 
-** Org Tempo
+* Org
+** Org tempo
+
 Org-tempo is not a separate package but a module within org that can be enabled.  Org-tempo allows for ‘<s’ followed by TAB to expand to a begin_src tag.  Other expansions available include:
 
 #+begin_src emacs-lisp
@@ -81,8 +83,27 @@ Disabling auto pair for < in org mode to make it work better with org tempo.
         (if (char-equal c ?< ) t (,electric-pair-inhibit-predicate c))))))
 #+end_src
 
+** Org Superstar
+
+For showing UTF-8 Bullets headings and lists
+
+#+begin_src emacs-lisp
+  (use-package org-superstar
+    :config
+    (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
+    )
+#+end_src
+
+Hide things characters like === for ==code== to make org mode more beautifull
+
+#+begin_src emacs-lisp
+(setq org-hide-emphasis-markers t)
+#+end_src
+
 * UI Configuration
 ** Fonts
+
+Setting font for windows and other operating system
 
 #+begin_src emacs-lisp
 (add-to-list 'default-frame-alist
@@ -94,6 +115,9 @@ Disabling auto pair for < in org mode to make it work better with org tempo.
 
 ** Theme
 
+Install themes and set default theme
+
+
 #+begin_src emacs-lisp
   (use-package gruber-darker-theme)
 
@@ -103,6 +127,9 @@ Disabling auto pair for < in org mode to make it work better with org tempo.
 #+end_src
 
 ** General
+
+Line numbering and relative line numbers
+
 #+begin_src emacs-lisp
 ;; Column number
 (column-number-mode 1)
@@ -138,7 +165,6 @@ Disabling auto pair for < in org mode to make it work better with org tempo.
 #+end_src
 
 * Programming Languages
-
 ** Go
 
 #+begin_src emacs-lisp
@@ -288,10 +314,37 @@ Disabling auto pair for < in org mode to make it work better with org tempo.
               (setq-local indent-tabs-mode nil)))
 #+end_src
 
-* General keybinding
+* Sudo Edit
 #+begin_src emacs-lisp
-  (defvar buffer-skip-exceptions '("*dashboard*" "*magit*")
-    "List of buffers that should not be skipped.")
+  (use-package sudo-edit)
+#+end_src
+* Commenting
+
++ =,= is used for commenting lines
+
+#+begin_src emacs-lisp
+  (use-package evil-nerd-commenter
+    :config
+    (evilnc-default-hotkeys)
+    )
+#+end_src
+
+* Dashboard
+#+begin_src emacs-lisp
+  (use-package dashboard
+    :ensure t
+    :config
+    (dashboard-setup-startup-hook))
+
+  ;; For opening emacsclient with dashboard
+  (setq initial-buffer-choice 'dashboard-open)
+#+end_src
+
+* General keybinding
+
+#+begin_src emacs-lisp
+  ;; (defvar buffer-skip-exceptions '("*dashboard*" "*magit*")
+  ;;   "List of buffers that should not be skipped.")
 
     (defun buffer-skip (window buffer bury-or-kill)
       "Return t if BUFFER name matches the pattern '*<anything>*' and is not in the exception list."
@@ -483,5 +536,15 @@ Disabling auto pair for < in org mode to make it work better with org tempo.
           "n t" '(org-todo-list :wk "Todo list")
           "n a" '(org-agenda :wk "Agenda")
           "n c" '(org-capture :wk "Capture"))
+
+        (vgk/leader-keys
+          "s" '(:ignore t :wk "Sudo")
+          "s u" '(sudo-edit-find-file :wk "Sudo find files")
+          "s U" `(sudo-edit :wk "Sudo edit"))
+
+        (vgk/leader-keys
+          "d" '(dashboard-open :wk "Open dashboard"))
+
         )
 #+end_src
+
