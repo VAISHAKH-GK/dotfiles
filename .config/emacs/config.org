@@ -386,6 +386,115 @@ Search and navigation commands
 #+begin_src emacs-lisp
 (use-package magit)
 #+end_src
+* LSP
+** Eglot
+
+#+begin_src emacs-lisp
+  (use-package eglot
+    :ensure nil
+    :hook
+    ((go-mode
+      python-mode
+      rust-mode
+      c-mode
+      c++-mode
+      typescript-mode
+      js-mode
+      web-mode) . eglot-ensure)
+
+    :custom
+    ;; Disable LSP logs
+    (eglot-events-buffer-size 0)
+
+    ;; Time to wait for LSP server
+    (eglot-connect-timeout 10)
+
+    ;; Automatically shutdown LSP server when buffer closes
+    (eglot-autoshutdown t)
+
+    ;; only show errors
+    (eglot-ignored-server-capabilities '(:documentHighlightProvider)))
+#+end_src
+** Corfu
+
+#+begin_src emacs-lisp
+  (use-package corfu
+    :init (global-corfu-mode 1)
+
+    :custom
+    ;; Show completion automatically
+    (corfu-auto 1)
+
+    ;; Delay before showing completion pop up
+    (corfu-auto-delay 0.2)
+
+    ;; Minimum char to show completion
+    (corfu-auto-prefix 2)
+
+    (corfu-cycle t)
+
+    (corfu-quit-no-match t)
+
+    :config
+    ;; Show docs popup after 0.5s when hovering a candidate
+    (corfu-popupinfo-mode 1))
+#+end_src
+** Kind Icon
+
+#+begin_src emacs-lisp
+(use-package kind-icon
+  ;; Shows icons next to completion candidates
+  ;; function, variable, snippet etc. each get different icons
+  :after corfu
+  :custom
+  (kind-icon-default-face 'corfu-default) ; matches corfu theme
+  :config
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+#+end_src
+** Cape
+
+#+begin_src emacs-lisp
+(use-package cape
+  ;; Extra completion sources that feed into corfu
+  :init
+  ;; Complete file paths (useful in shell modes, org etc.)
+  (add-to-list 'completion-at-point-functions #'cape-file)
+
+  ;; Complete words from any open buffer
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+
+  ;; Complete Emacs keywords
+  (add-to-list 'completion-at-point-functions #'cape-keyword))
+#+end_src
+* Treemacs
+
+#+begin_src emacs-lisp
+(use-package treemacs
+  :custom
+  ;; Width of the treemacs panel in characters
+  (treemacs-width 30)
+
+  ;; Follow the currently open file in the tree
+  (treemacs-follow-mode t)
+
+  ;; Automatically sync tree with currently open file
+  (treemacs-filewatch-mode t)
+
+  ;; Show git status icons on files/folders
+  (treemacs-git-mode 'simple)
+
+  ;; Collapse empty directories into one line
+  ;; e.g. src/main/java shows as one node
+  (treemacs-collapse-dirs 3))
+
+;; Evil keybindings inside treemacs panel
+(use-package treemacs-evil
+  :after (treemacs evil))
+
+;; Shows git status with different colors per file
+(use-package treemacs-magit
+  :after (treemacs magit))
+#+end_src
 * General keybinding
 
 #+begin_src emacs-lisp
@@ -493,7 +602,8 @@ Search and navigation commands
       "t" '(:ignore t :wk "Toggle")
       "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
       "t t" '(visual-line-mode :wk "Toggle truncated lines") 
-      "t n" '(neotree-toggle :wk "Toggle neotree file viewer"))
+      "t n" '(treemacs :wk "Toggle treemacs")
+      "t f" '(treemacs-find-file :wk "Find file in treemacs"))
 
     (vgk/leader-keys
       "w" '(:ignore t :wk "Windows")
