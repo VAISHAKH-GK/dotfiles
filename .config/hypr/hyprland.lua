@@ -89,7 +89,6 @@ local waybar_blur = hl.layer_rule({
     match = {namespace = "waybar"},
     blur = true,
 })
-waybar_blur:set_enabled(true)
 
 -- GESTURES
 hl.gesture({
@@ -126,9 +125,9 @@ hl.bind("Print",
 
 -- Apps
 for key, cmd in pairs({
-    RETURN = "footclient",
+    RETURN = "kitty",
     B      = "zen-browser",
-    F      = "footclient -e yazi",
+    F      = "kitty -e yazi",
     P      = "thunar",
     O      = "systune",
     T      = "thunderbird",
@@ -170,6 +169,8 @@ hl.bind(S .. " + mouse_down", hl.dsp.focus({workspace = "e-1"}))
 hl.bind(S .. " + mouse_up", hl.dsp.focus({workspace = "e+1"}))
 hl.bind(S .. " + H", hl.dsp.focus({workspace = "e-1"}))
 hl.bind(S .. " + L", hl.dsp.focus({workspace = "e+1"}))
+hl.bind(S .. " + Left", hl.dsp.focus({workspace = "e-1"}))
+hl.bind(S .. " + Right", hl.dsp.focus({workspace = "e+1"}))
 
 -- Layout
 hl.bind(S  .. " + J", hl.dsp.layout("cyclenext"))
@@ -280,7 +281,6 @@ local startup_apps = {
     "udiskie -A -t",
     "blueman-applet",
     "lxsession",
-    "foot --server",
     "ags run",
     "swayosd-server",
     "wl-paste --type text --watch cliphist store",
