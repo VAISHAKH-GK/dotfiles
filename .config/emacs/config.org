@@ -224,6 +224,12 @@ In-buffer completion popup
                 (corfu-mode -1)))
   :bind
   ("C-SPC" . completion-at-point)
+  (:map corfu-map
+        ("TAB" . corfu-next)
+        ("<tab>" . corfu-next)
+        ("S-TAB" . corfu-previous)
+        ("<backtab>" . corfu-previous)
+        ("RET" . corfu-insert))
   :custom
   (corfu-auto t)          ;; show popup automatically while typing
   (corfu-auto-delay 0.2)  ;; small delay before popup appears
@@ -241,6 +247,12 @@ Extra completion-at-point sources (file paths, dabbrev, etc.)
   :init
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-file))
+#+end_src
+** Yasnippet
+#+begin_src eamcs-lisp
+(use-package yasnippet
+  :config
+  (yas-global-mode 1))
 #+end_src
 * Programming Languages
 ** Go
@@ -286,6 +298,14 @@ Extra completion-at-point sources (file paths, dabbrev, etc.)
           (lambda ()
             (setq-local indent-tabs-mode nil)
             (setq-local tab-width 4)))
+#+end_src
+
+*** Pyenv
+
+#+begin_src emacs-lisp
+(use-package pyvenv
+  :config
+  (pyvenv-mode 1))
 #+end_src
 
 ** JavaScript
