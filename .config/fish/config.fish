@@ -23,6 +23,8 @@ end
 function fish_user_key_bindings
   fish_vi_key_bindings
 end
+
+set -x PYENV_ROOT $HOME/.pyenv
 set -x ANDROID_SDK_ROOT ~/Android/Sdk
 set -x ANDROID_HOME $ANDROID_SDK_ROOT
 set -x ANDROID_AVD_HOME $HOME/.android/avd
@@ -30,10 +32,12 @@ set -x PATH $PATH $ANDROID_SDK_ROOT/cmdline-tools/latest/bin $ANDROID_SDK_ROOT/e
 set -x JAVA_HOME /usr/lib/jvm/java-25-openjdk
 set -x GRADLE_LOCAL_JAVA_HOME /usr/lib/jvm/java-25-openjdk
 set -x PATH $PATH /home/vaishakh/.local/bin
+set -x PATH $PATH /home/vaishakh/.local/share/nvm/v26.0.0/bin/
 set -x PATH $PATH ~/.cargo/bin/
 set -x PATH $PATH ~/go/bin/
 set -x PATH $PATH ~/.config/emacs/bin/
 set -x PATH $PATH ~/scripts/
+set -x PATH $PATH $PYENV_ROOT
 set -x GOPATH ~/go
 set -x GOBIN ~/go/bin
 set -x GOPROXY direct
