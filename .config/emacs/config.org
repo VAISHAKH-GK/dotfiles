@@ -140,7 +140,7 @@ Install themes and set default theme
 + Transperancy
 
 #+begin_src emacs-lisp
-(add-to-list 'default-frame-alist '(alpha-background . 80))
+;; (add-to-list 'default-frame-alist '(alpha-background . 80))
 #+end_src
 
 ** General
@@ -211,6 +211,37 @@ Search and navigation commands
 (use-package consult)
 #+end_src
 
+** Corfu
+
+In-buffer completion popup
+
+#+begin_src emacs-lisp
+(use-package corfu
+  :init
+  (global-corfu-mode)
+  :hook
+  (org-mode . (lambda ()
+                (corfu-mode -1)))
+  :bind
+  ("C-SPC" . completion-at-point)
+  :custom
+  (corfu-auto t)          ;; show popup automatically while typing
+  (corfu-auto-delay 0.2)  ;; small delay before popup appears
+  (corfu-auto-prefix 1)   ;; trigger after 1 character typed
+  (corfu-cycle t)         ;; cycle through candidates
+  (corfu-preselect 'prompt))
+#+end_src
+
+** Cape
+
+Extra completion-at-point sources (file paths, dabbrev, etc.)
+
+#+begin_src emacs-lisp
+(use-package cape
+  :init
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-file))
+#+end_src
 * Programming Languages
 ** Go
 
@@ -232,9 +263,17 @@ Search and navigation commands
             (setq-local indent-tabs-mode nil)
             (setq-local tab-width 4)))
 
+(add-hook 'c-ts-mode-hook
+          (lambda ()
+            (eglot-ensure)
+            (setq-local indent-tabs-mode nil)
+            (setq-local c-ts-mode-indent-offset 4)
+            (setq-local tab-width 4)))
+
 (add-hook 'c++-mode-hook
           (lambda ()
             (setq-local indent-tabs-mode nil)
+            (setq-local c-ts-mode-indent-offset 4)
             (setq-local tab-width 4)))
 #+end_src
 
@@ -364,6 +403,40 @@ Search and navigation commands
             (setq-local indent-tabs-mode nil)))
 #+end_src
 
+** QML
+#+begin_src emacs-lisp
+(use-package qml-mode)
+#+end_src
+** Eglot
+#+begin_src emacs-lisp
+(use-package eglot
+  :ensure nil  ;; built-in, don't try to install from package archives
+  :hook
+  ((go-mode . eglot-ensure)
+   (c-ts-mode . eglot-ensure)
+   (c++-mode . eglot-ensure)
+   (python-ts-mode . eglot-ensure)
+   (js-mode . eglot-ensure)
+   (typescript-mode . eglot-ensure)
+   (web-mode . eglot-ensure)
+   (rust-mode . eglot-ensure))
+  :config
+  (setq eglot-autoshutdown t)        ;; kill server when last buffer closes
+  (setq eglot-confirm-server-initiated-edits nil))
+#+end_src
+** TreeSitter
+#+begin_src emacs-lisp
+(use-package treesit-auto
+  :custom
+  (treesit-auto-install 'prompt)
+  :config
+  (treesit-auto-add-to-auto-mode-alist 'all)
+  (global-treesit-auto-mode))
+
+(add-hook 'tsx-ts-mode-hook 'eglot-ensure)
+(add-hook 'typescript-ts-mode-hook 'eglot-ensure)
+(setq treesit-font-lock-level 4)
+#+end_src
 * Sudo Edit
 #+begin_src emacs-lisp
 (use-package sudo-edit)
@@ -399,15 +472,17 @@ Search and navigation commands
 
 #+begin_src emacs-lisp
 (use-package treemacs
-  :custom
-  ;; Width of the treemacs panel in characters
-  (treemacs-width 30)
-
+  :config
   ;; Follow the currently open file in the tree
   (treemacs-follow-mode t)
 
   ;; Automatically sync tree with currently open file
   (treemacs-filewatch-mode t)
+
+  :custom
+  ;; Width of the treemacs panel in characters
+  (treemacs-width 30)
+
 
   ;; Show git status icons on files/folders
   (treemacs-git-mode 'simple)
@@ -423,6 +498,9 @@ Search and navigation commands
 ;; Shows git status with different colors per file
 (use-package treemacs-magit
   :after (treemacs magit))
+
+(use-package treemacs-projectile
+  :after (treemacs projectile))
 #+end_src
 * Orderless
 #+begin_src emacs-lisp
@@ -432,6 +510,11 @@ Search and navigation commands
   (completion-styles '(orderless basic))
   (completion-category-overrides '((file (styles partial-completion))))
   (completion-pcm-leading-wildcard t)) ;; Emacs 31: partial-completion behaves like substring
+
+(setq orderless-matching-styles '(orderless-literal orderless-regexp))
+(setq completion-ignore-case t)
+(setq read-buffer-completion-ignore-case t)
+(setq read-file-name-completion-ignore-case t)
 #+end_src
 * General keybinding
 
@@ -541,6 +624,7 @@ Search and navigation commands
     "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
     "t t" '(visual-line-mode :wk "Toggle truncated lines") 
     "t n" '(treemacs :wk "Toggle treemacs")
+    "t o" '(treemacs-add-and-display-current-project-exclusively :wk "Open treemacs in current directory")
     "t f" '(treemacs-find-file :wk "Find file in treemacs"))
 
   (vgk/leader-keys
@@ -618,12 +702,12 @@ Search and navigation commands
 
   (vgk/leader-keys
     "l" '(:ignore t :wk "Lsp keybindings")
-    "l d" '(lsp-ui-doc-glance :wk "Lsp Description")
-    "l g" '(lsp-find-definition :wk "Lsp go to Definition")
-    "l r" '(lsp-rename :wk "Lsp Rename")
-    "l f" '(:ignore :wk "Lsp Code formatting")
-    "l f r" '(lsp-format-region :wk "Lsp format region")
-    "l f b" '(lsp-format-buffer :wk "Lsp format buffer"))
+    "l d" '(eldoc :wk "Eglot Description")
+    "l g" '(xref-find-definitions :wk "Eglot go to Definition")
+    "l r" '(eglot-rename :wk "Eglot Rename")
+    "l f" '(:ignore :wk "Eglot Code formatting")
+    "l f r" '(eglot-format :wk "Eglot format region")
+    "l f b" '(eglot-format-buffer :wk "Eglot format buffer"))
 
   (vgk/leader-keys
     "n" '(:ignore t :wk "Notes")
@@ -642,3 +726,17 @@ Search and navigation commands
   )
 #+end_src
 
+* Vterm
+#+begin_src emacs-lisp
+(use-package vterm)
+(use-package vterm-toggle
+  :after vterm
+  :custom
+  (vterm-toggle-fullscreen-p nil)
+  (vterm-toggle-scope 'project)
+  (vterm-toggle-size-percent 30))
+
+(add-to-list 'display-buffer-alist '("\\*vterm.*\\*"
+   (display-buffer-at-bottom)
+   (window-height . 0.35)))
+#+end_src
