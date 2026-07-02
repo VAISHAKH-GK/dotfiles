@@ -281,7 +281,6 @@ local startup_apps = {
     "udiskie -A -t",
     "blueman-applet",
     "lxsession",
-    "ags run",
     "swayosd-server",
     "wl-paste --type text --watch cliphist store",
     "wl-paste --type image --watch cliphist store",

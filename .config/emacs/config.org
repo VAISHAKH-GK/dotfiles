@@ -132,9 +132,11 @@ Install themes and set default theme
 #+begin_src emacs-lisp
 (use-package gruber-darker-theme)
 
-(use-package catppuccin-theme
-  :config
-  (load-theme 'catppuccin t))
+(use-package catppuccin-theme)
+
+(use-package doom-themes)
+(load-theme 'doom-moonlight t)
+
 #+end_src
 
 + Transperancy
@@ -753,10 +755,17 @@ Extra completion-at-point sources (file paths, dabbrev, etc.)
   :after vterm
   :custom
   (vterm-toggle-fullscreen-p nil)
-  (vterm-toggle-scope 'project)
-  (vterm-toggle-size-percent 30))
+  (vterm-toggle-scope 'project))
 
 (add-to-list 'display-buffer-alist '("\\*vterm.*\\*"
    (display-buffer-at-bottom)
-   (window-height . 0.35)))
+   (window-height . 0.40)))
+#+end_src
+
+
+* Doom modeline
+#+begin_src eamcs-lisp
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1))
 #+end_src
