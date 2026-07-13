@@ -5,10 +5,10 @@ if status is-interactive
   # Commands to run in interactive sessions can go here
   alias mv='mv -i'
   alias rm='rm -i'
-  alias ls='eza --group-directories-first --icons'
-  alias la="eza -a --group-directories-first --icons"
-  alias ll="eza -lh --group-directories-first --icons --group"
-  alias lla="eza -lah --group-directories-first --icons --group"
+  alias ls='eza --group-directories-first --icons auto'
+  alias la="eza -a --group-directories-first --icons auto"
+  alias ll="eza -lh --group-directories-first --icons auto --group"
+  alias lla="eza -lah --group-directories-first --icons auto --group"
   alias tmux="tmux -u"
   alias nvim-lazy="NVIM_APPNAME=lazyvim nvim"
   alias g="git"
