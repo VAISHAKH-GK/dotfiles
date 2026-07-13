@@ -135,8 +135,28 @@ Install themes and set default theme
 (use-package catppuccin-theme)
 
 (use-package doom-themes)
-(load-theme 'doom-moonlight t)
+;; (load-theme 'doom-moonlight t)
 
+(use-package ewal
+  :ensure t)
+
+(use-package ewal-doom-themes
+  :ensure t
+  :after ewal
+  :config
+  (load-theme 'ewal-doom-one t))
+#+end_src
+
+Function to reload pywal theme
+
+#+begin_src emacs-lisp
+(defun my/reload-pywal-theme ()
+  (interactive)
+  (mapc #'disable-theme custom-enabled-themes)
+  (require 'ewal)
+  (ewal-load-colors)
+  (load-theme 'ewal-doom-one t)
+  (redraw-display))
 #+end_src
 
 + Transperancy
@@ -762,9 +782,8 @@ Extra completion-at-point sources (file paths, dabbrev, etc.)
    (window-height . 0.40)))
 #+end_src
 
-
 * Doom modeline
-#+begin_src eamcs-lisp
+#+begin_src emacs-lisp
 (use-package doom-modeline
   :ensure t
   :init (doom-modeline-mode 1))
