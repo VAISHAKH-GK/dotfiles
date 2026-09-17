@@ -128,7 +128,7 @@ for key, cmd in pairs({
     RETURN = "kitty",
     B      = "zen-browser",
     F      = "kitty -e yazi",
-    P      = "thunar",
+    P      = "nemo",
     O      = "systune",
     T      = "thunderbird",
     E      = "emacsclient --create-frame",
