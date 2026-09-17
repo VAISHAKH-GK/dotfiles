@@ -1,3 +1,4 @@
+;; -*- lexical-binding: nil; -*-
 ;; Disable package.el at startup
 (setq package-enable-at-startup nil)
 

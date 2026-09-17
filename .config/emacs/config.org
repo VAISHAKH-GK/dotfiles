@@ -3,6 +3,10 @@
 #+DESCRIPTION: Personal Emacs Configuration
 #+STARTUP: overview
 
+#+begin_src emacs-lisp
+;;; -*- lexical-binding: nil; -*-
+#+end_src
+
 * Package Management
 
 #+begin_src emacs-lisp
@@ -130,8 +134,6 @@ Setting font for windows and other operating system
 Install themes and set default theme
 
 #+begin_src emacs-lisp
-(use-package gruber-darker-theme)
-
 (use-package catppuccin-theme)
 
 (use-package doom-themes)
