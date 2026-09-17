@@ -285,8 +285,15 @@ Extra completion-at-point sources (file paths, dabbrev, etc.)
 (use-package go-mode
   :hook
   (go-mode . (lambda ()
-               (setq-local tab-width 4)
+               (setq-local tab-width 2)
                (setq-local indent-tabs-mode t))))
+
+(add-hook 'go-ts-mode-hook
+          (lambda ()
+            (eglot-ensure)
+            (setq-local go-ts-indent-offset 2)
+            (setq-local indent-tabs-mode t)
+            (setq-local tab-width 2)))
 #+end_src
 
 ** C / C++
